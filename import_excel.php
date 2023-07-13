@@ -1,3 +1,5 @@
+<?php
+
 require_once '../vendor/autoload.php';
 require_once '../products.php';
 
@@ -64,40 +66,47 @@ class Service
 
     public const aviaClasses = [
         '1' => [
-            'class' => 21,
-            'date' => 18,
-            'flight' => 17,
-            'name' => '1'
+			'class'  => 21,
+			'date'   => 18,
+			'flight' => 17,
+			'name'   => '1',
+			'pole4'  => 'property423',
         ],
         '2' => [
-            'class' => 26,
-            'date' => 23,
-            'flight' => 22,
-            'name' => '2'
+			'class'  => 26,
+			'date'   => 23,
+			'flight' => 22,
+			'name'   => '2',
+			'pole4' => 'property431',
+
         ],
         '3' => [
             'class' => 31,
             'date' => 28,
             'flight' => 27,
-            'name' => '3'
+            'name' => '3',
+			'pole4' => 'property439',
         ],
         '4' => [
             'class' => 36,
             'date' => 33,
             'flight' => 32,
-            'name' => '4'
+            'name' => '4',
+			'pole4' => 'property447',
         ],
         '5' => [
             'class' => 41,
             'date' => 38,
             'flight' => 37,
-            'name' => '5'
+            'name' => '5',
+			'pole4' => 'property455',
         ],
         '6' => [
             'class' => 46,
             'date' => 43,
             'flight' => 42,
-            'name' => '6'
+            'name' => '6',
+			'pole4' => 'property463',
         ],
     ];
 
@@ -489,27 +498,10 @@ class Service
 
 //                    Добавляем авиаполя
 
-                        foreach (self::aviaClasses as $segment) {
-                            $avia_class = trim($sheet->getCell([$segment['class'], $currentRow]));
-                            $avia_class_id = '';
-                            if (!empty($avia_class)) {
-                                foreach ($allData['result']['result']['classList']['product']['property423']['values'] as $class) {
-                                    if ($class['value'] === $avia_class) {
-                                        $avia_class_id = $class['id'];
-                                        $classIds[$segment['name']] = $avia_class_id;
-                                    }
-                                }
-                            }
-                        }
-                        CRest::setLog([
-                            '$classIds' => $classIds,
-                        ], '$$classIds_1');
-                        $segmentQuantity = count($classIds);
-
                         $vars = [
                             1 => [
                                 'pole1' => 'property417',
-                                'pole2' => 'proprety419',
+                                'pole2' => 'property419',
                                 'pole3' => 'property421',
                                 'pole4' => 'property423',
                                 'pole5' => 'property497',
@@ -518,7 +510,7 @@ class Service
                             ],
                             2 => [
                                 'pole1' => 'property425',
-                                'pole2' => 'proprety427',
+                                'pole2' => 'property427',
                                 'pole3' => 'property429',
                                 'pole4' => 'property431',
                                 'pole5' => 'property499',
@@ -527,7 +519,7 @@ class Service
                             ],
                             3 => [
                                 'pole1' => 'property433',
-                                'pole2' => 'proprety435',
+                                'pole2' => 'property435',
                                 'pole3' => 'property437',
                                 'pole4' => 'property439',
                                 'pole5' => 'property501',
@@ -536,7 +528,7 @@ class Service
                             ],
                             4 => [
                                 'pole1' => 'property441',
-                                'pole2' => 'proprety443',
+                                'pole2' => 'property443',
                                 'pole3' => 'property445',
                                 'pole4' => 'property447',
                                 'pole5' => 'property503',
@@ -545,7 +537,7 @@ class Service
                             ],
                             5 => [
                                 'pole1' => 'property449',
-                                'pole2' => 'proprety451',
+                                'pole2' => 'property451',
                                 'pole3' => 'property453',
                                 'pole4' => 'property455',
                                 'pole5' => 'property505',
@@ -554,7 +546,7 @@ class Service
                             ],
                             6 => [
                                 'pole1' => 'property457',
-                                'pole2' => 'proprety459',
+                                'pole2' => 'property459',
                                 'pole3' => 'property461',
                                 'pole4' => 'property463',
                                 'pole5' => 'property507',
@@ -562,6 +554,23 @@ class Service
                                 'arrivalCity' => 'arrival6',
                             ]
                         ];
+
+						foreach (self::aviaClasses as $segment) {
+							$avia_class    = trim($sheet->getCell([$segment['class'], $currentRow]));
+							$avia_class_id = '';
+							if (!empty($avia_class)) {
+								foreach ($allData['result']['result']['classList']['product'][$segment['pole4']]['values'] as $class) {
+									if ($class['value'] === $avia_class) {
+										$avia_class_id = $class['id'];
+										$classIds[$segment['name']] = $avia_class_id;
+									}
+								}
+							}
+						}
+						CRest::setLog([
+										  '$classIds' => $classIds,
+									  ], '$$classIds_1');
+						$segmentQuantity = count($classIds);
 
                         for ($i = 1; $i <= $segmentQuantity; $i++) {
 
@@ -576,15 +585,10 @@ class Service
                             $params['fields'][$vars[$i]['pole3']]['value'] = $phpFlightDate;
                             $params['fields'][$vars[$i]['pole4']]['value'] = $classIds[$i];
                             $params['fields'][$vars[$i]['pole5']]['value'] = $allData['result']['result'][$vars[$i]['arrivalCity']][0]['ID'];
-
-
-                            CRest::setLog([
-                                '$params' => $params,
-                            ], '$params_creator_1');
                         }
                         CRest::setLog([
                             '$params' => $params,
-                        ], '$activeSegments_creator_2');
+                        ], '$activeSegments_creator_after_avia');
                         #endregion
 
                         #region                2.3 Добавляем поля для ж/д
@@ -606,7 +610,7 @@ class Service
                     }
                     CRest::setLog([
                         '$params' => $params,
-                    ], '$params_creator_1');
+                    ], '$activeSegments_creator_after_railway');
                     #endregion
 
 
